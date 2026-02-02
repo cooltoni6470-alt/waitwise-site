@@ -1,1 +1,516 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WaitWise — Real-time wait times</title>
+    <meta
+      name="description"
+      content="WaitWise shows real-time wait times, crowd levels, and vibes—powered by people near you."
+    />
+    <style>
+      :root{
+        --bg:#07090c;
+        --panel:#0c111a;
+        --panel2:#0a0f17;
+        --border:rgba(255,255,255,.10);
+        --text:rgba(255,255,255,.92);
+        --muted:rgba(255,255,255,.68);
+        --subtle:rgba(255,255,255,.55);
+        --teal:#00E6C3;
+        --teal2:#00c9ac;
+        --shadow: 0 16px 60px rgba(0,0,0,.45);
+        --radius: 22px;
+        --max: 1120px;
+      }
 
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{
+        margin:0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+        background:
+          radial-gradient(1200px 700px at 20% 0%, rgba(0,230,195,.12), transparent 55%),
+          radial-gradient(900px 600px at 90% 10%, rgba(0,230,195,.10), transparent 50%),
+          radial-gradient(900px 600px at 50% 110%, rgba(255,255,255,.05), transparent 55%),
+          var(--bg);
+        color:var(--text);
+        overflow-x:hidden;
+      }
+
+      a{color:inherit; text-decoration:none}
+      .wrap{max-width:var(--max); margin:0 auto; padding:28px 20px 90px}
+      .nav{
+        display:flex; align-items:center; justify-content:space-between;
+        position:sticky; top:0; z-index:20;
+        backdrop-filter: blur(10px);
+        background: linear-gradient(to bottom, rgba(7,9,12,.75), rgba(7,9,12,.35));
+        border-bottom: 1px solid rgba(255,255,255,.06);
+        padding:14px 20px;
+      }
+      .brand{
+        display:flex; align-items:center; gap:10px;
+        font-weight:800; letter-spacing:.2px;
+      }
+      .logo{
+        width:34px; height:34px; border-radius:12px;
+        background:
+          radial-gradient(18px 18px at 30% 30%, rgba(255,255,255,.45), transparent 60%),
+          linear-gradient(180deg, rgba(0,230,195,.95), rgba(0,201,172,.85));
+        box-shadow: 0 10px 30px rgba(0,230,195,.20);
+        border: 1px solid rgba(255,255,255,.18);
+      }
+      .navlinks{display:flex; gap:16px; align-items:center; color:var(--muted); font-weight:600}
+      .navlinks a{padding:10px 10px; border-radius:12px}
+      .navlinks a:hover{background:rgba(255,255,255,.06); color:var(--text)}
+      .<a class="btn primary" href="https://forms.gle/8jQ8Fyd3s1ziYtpM6" target="_blank">
+  Join the waitlist
+</a>
+      .btn{
+        display:inline-flex; align-items:center; justify-content:center;
+        gap:10px;
+        border-radius: 14px;
+        padding: 12px 14px;
+        font-weight:800;
+        border: 1px solid rgba(255,255,255,.12);
+        background: rgba(255,255,255,.06);
+        color: var(--text);
+        cursor:pointer;
+        transition: transform .12s ease, background .12s ease, border-color .12s ease;
+      }
+      .btn:hover{transform: translateY(-1px); background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.18)}
+      .btn.primary{
+        background: linear-gradient(180deg, var(--teal), var(--teal2));
+        color:#061014;
+        border: 0;
+        box-shadow: 0 16px 44px rgba(0,230,195,.22);
+      }
+      .btn.primary:hover{transform: translateY(-1px); filter: brightness(1.02)}
+      .pill{
+        display:inline-flex; gap:8px; align-items:center;
+        padding:8px 12px; border-radius:999px;
+        border:1px solid rgba(255,255,255,.12);
+        background: rgba(255,255,255,.06);
+        color: var(--muted);
+        font-weight:700;
+        width:fit-content;
+      }
+      .dot{
+        width:8px; height:8px; border-radius:999px;
+        background: var(--teal);
+        box-shadow: 0 0 0 6px rgba(0,230,195,.15);
+      }
+
+      .hero{
+        padding: 60px 0 20px;
+        display:grid;
+        grid-template-columns: 1.05fr .95fr;
+        gap: 26px;
+        align-items:center;
+      }
+      h1{
+        font-size: clamp(36px, 4.6vw, 60px);
+        line-height: 1.03;
+        margin: 14px 0 12px;
+        letter-spacing: -1.2px;
+      }
+      .sub{
+        font-size: 18px;
+        line-height: 1.55;
+        color: var(--muted);
+        max-width: 52ch;
+        margin: 0 0 18px;
+      }
+      .hero-actions{
+        display:flex; gap:12px; flex-wrap:wrap;
+        margin-top: 16px;
+      }
+      .fine{
+        color: var(--subtle);
+        font-size: 13px;
+        margin-top: 10px;
+      }
+
+      .card{
+        border-radius: var(--radius);
+        background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+        border: 1px solid rgba(255,255,255,.12);
+        box-shadow: var(--shadow);
+        overflow:hidden;
+      }
+      .preview{
+        padding: 18px;
+      }
+      .phone{
+        border-radius: 28px;
+        border: 1px solid rgba(255,255,255,.14);
+        background:
+          radial-gradient(500px 220px at 30% 10%, rgba(0,230,195,.16), transparent 55%),
+          linear-gradient(180deg, rgba(12,17,26,.92), rgba(10,15,23,.92));
+        padding: 18px;
+        position:relative;
+        min-height: 380px;
+      }
+      .phone .topbar{
+        display:flex; justify-content:space-between; align-items:center;
+        color: rgba(255,255,255,.55);
+        font-weight:700;
+        font-size: 13px;
+        margin-bottom: 12px;
+      }
+      .search{
+        background: rgba(0,0,0,.35);
+        border:1px solid rgba(255,255,255,.10);
+        border-radius: 16px;
+        padding: 12px 12px;
+        color: rgba(255,255,255,.55);
+        margin-bottom: 12px;
+      }
+      .bigbtn{
+        width:100%;
+        border-radius: 16px;
+        padding: 14px 14px;
+        font-weight:900;
+        text-align:center;
+        background: linear-gradient(180deg, var(--teal), var(--teal2));
+        color:#061014;
+        border: 0;
+        box-shadow: 0 16px 44px rgba(0,230,195,.20);
+        margin-bottom: 14px;
+      }
+      .minirow{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin: 10px 0 12px;}
+      .minicard{
+        border-radius: 16px;
+        border:1px solid rgba(255,255,255,.10);
+        background: rgba(0,0,0,.25);
+        padding: 12px;
+      }
+      .minicard .label{color:rgba(255,255,255,.60); font-size:12px; font-weight:700}
+      .minicard .value{font-size:22px; font-weight:900; margin-top:6px}
+      .list{
+        display:flex; flex-direction:column; gap:10px;
+      }
+      .place{
+        border-radius: 18px;
+        border:1px solid rgba(255,255,255,.10);
+        background: rgba(0,0,0,.25);
+        padding: 12px;
+      }
+      .place .name{font-weight:900}
+      .place .meta{color:rgba(255,255,255,.60); font-size:12px; margin-top:4px}
+      .badge{
+        display:inline-flex; align-items:center; gap:8px;
+        margin-top:10px;
+        padding: 8px 10px;
+        border-radius: 999px;
+        background: rgba(255,255,255,.06);
+        border: 1px solid rgba(255,255,255,.10);
+        color:rgba(255,255,255,.72);
+        font-weight:800;
+        font-size:12px;
+      }
+      .badge .tiny{width:7px; height:7px; border-radius:999px; background: rgba(255,70,70,.9)}
+      .est{color:rgba(255,255,255,.80); font-weight:800; margin-top:8px}
+
+      .section{
+        margin-top: 54px;
+      }
+      .section h2{
+        font-size: 26px;
+        margin: 0 0 10px;
+        letter-spacing: -0.4px;
+      }
+      .section p{
+        margin: 0 0 18px;
+        color: var(--muted);
+        line-height:1.6;
+        max-width: 70ch;
+      }
+
+      .grid{
+        display:grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 14px;
+      }
+      .feature{
+        grid-column: span 6;
+        padding: 18px;
+      }
+      .feature h3{margin: 10px 0 8px; letter-spacing:-.2px}
+      .feature p{margin:0; color:var(--muted)}
+      .icon{
+        width:40px; height:40px; border-radius: 16px;
+        display:grid; place-items:center;
+        background: rgba(0,230,195,.10);
+        border: 1px solid rgba(0,230,195,.25);
+        color: var(--teal);
+        font-weight: 900;
+      }
+
+      .waitlist{
+        display:grid;
+        grid-template-columns: 1.1fr .9fr;
+        gap: 14px;
+        align-items: stretch;
+      }
+      form{
+        display:flex; gap:10px; flex-wrap:wrap;
+        margin-top: 10px;
+      }
+      input{
+        flex: 1 1 240px;
+        padding: 14px 14px;
+        border-radius: 14px;
+        border: 1px solid rgba(255,255,255,.14);
+        background: rgba(0,0,0,.30);
+        color: var(--text);
+        outline: none;
+      }
+      input:focus{border-color: rgba(0,230,195,.55); box-shadow: 0 0 0 5px rgba(0,230,195,.10)}
+      .smallprint{font-size:12px; color:var(--subtle); margin-top:10px}
+
+      .faq{
+        display:grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+      details{
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,.12);
+        background: rgba(255,255,255,.05);
+        padding: 14px 14px;
+      }
+      summary{cursor:pointer; font-weight:900}
+      details p{margin:10px 0 0; color:var(--muted)}
+
+      footer{
+        margin-top: 60px;
+        padding-top: 24px;
+        border-top: 1px solid rgba(255,255,255,.08);
+        display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
+        color: rgba(255,255,255,.55);
+        font-weight:700;
+      }
+
+      @media (max-width: 920px){
+        .hero{grid-template-columns:1fr; padding-top:38px}
+        .waitlist{grid-template-columns:1fr}
+        .faq{grid-template-columns:1fr}
+        .feature{grid-column: span 12}
+        .navlinks{display:none}
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="nav">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>WaitWise</div>
+      </div>
+
+      <div class="navlinks">
+        <a href="#features">Features</a>
+        <a href="#screens">Screens</a>
+        <a href="#faq">FAQ</a>
+      </div>
+
+      <div class="cta">
+        <a class="btn" href="#waitlist">Join waitlist</a>
+        <a class="btn primary" href="#waitlist">Get early access</a>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <section class="hero">
+        <div>
+          <div class="pill"><span class="dot"></span> Real-time waits, crowd levels, and vibes</div>
+          <h1>Skip long lines before you leave.</h1>
+          <p class="sub">
+            WaitWise shows live wait times nearby—powered by quick reports from people in your area.
+            Decide where to go in seconds.
+          </p>
+
+          <div class="hero-actions">
+            <a class="btn primary" href="#waitlist">Join the waitlist</a>
+            <a class="btn" href="#features">See how it works</a>
+          </div>
+          <div class="fine">Built for coffee runs, dining halls, gyms, DMVs, and anything with a line.</div>
+        </div>
+
+        <div class="card preview">
+          <div class="phone">
+            <div class="topbar">
+              <span>WaitWise</span><span>Live</span>
+            </div>
+            <div class="search">Search places (coffee, dining, DMV…)</div>
+            <div class="bigbtn">+ New report</div>
+
+            <div class="minirow">
+              <div class="minicard">
+                <div class="label">Avg wait near you</div>
+                <div class="value">7 min</div>
+              </div>
+              <div class="minicard">
+                <div class="label">Reports today</div>
+                <div class="value">23</div>
+              </div>
+            </div>
+
+            <div class="list">
+              <div class="place">
+                <div class="name">Chef Mike’s</div>
+                <div class="meta">Updated 6m ago • Reported</div>
+                <div class="est">~12 min</div>
+              </div>
+              <div class="place">
+                <div class="name">JJ’s Place</div>
+                <div class="meta">Estimated • Low confidence</div>
+                <span class="badge"><span class="tiny"></span> estimated baseline</span>
+                <div class="est">~24 min</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="features" class="section">
+        <h2>How WaitWise works</h2>
+        <p>
+          People report how long they waited and how crowded it felt. WaitWise turns that into a live view of lines nearby—
+          with clear “reported” vs “estimated” signals.
+        </p>
+
+        <div class="grid">
+          <div class="card feature">
+            <div class="icon">⏱</div>
+            <h3>Real-time wait reports</h3>
+            <p>Quick submission flow. See updated waits nearby without guessing.</p>
+          </div>
+
+          <div class="card feature">
+            <div class="icon">👥</div>
+            <h3>Crowd level + vibes</h3>
+            <p>Not just minutes. Know whether it feels calm, normal, or packed.</p>
+          </div>
+
+          <div class="card feature">
+            <div class="icon">🗺</div>
+            <h3>Live map</h3>
+            <p>Spot hotspots instantly. Tap pins to view latest updates.</p>
+          </div>
+
+          <div class="card feature">
+            <div class="icon">🏅</div>
+            <h3>Impact + achievements</h3>
+            <p>See how your reports help others save time and earn badges.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="screens" class="section">
+        <h2>Screens</h2>
+        <p>
+          Replace these placeholders with your real app screenshots anytime. (You can drag images into this repo later and update the paths.)
+        </p>
+
+        <div class="grid">
+          <div class="card feature" style="grid-column: span 4;">
+            <div class="icon">🏠</div>
+            <h3>Home</h3>
+            <p>Top nearby waits, fast stats, and one-tap reporting.</p>
+          </div>
+          <div class="card feature" style="grid-column: span 4;">
+            <div class="icon">📍</div>
+            <h3>Nearby</h3>
+            <p>All places within your radius, sorted by the freshest info.</p>
+          </div>
+          <div class="card feature" style="grid-column: span 4;">
+            <div class="icon">🧭</div>
+            <h3>Map</h3>
+            <p>Explore hotspots visually and find the shortest line.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="waitlist" class="section">
+        <div class="card feature waitlist">
+          <div>
+            <h2>Get early access</h2>
+            <p>Drop your email to join the WaitWise waitlist. I’ll send updates and invite-only builds.</p>
+
+            <!-- Replace action="#" with your Formspree/Tally/Google Form endpoint -->
+            <form action="#" method="post" onsubmit="return fakeSubmit(event)">
+              <input name="email" type="email" placeholder="Email address" required />
+              <button class="btn primary" type="submit">Join waitlist</button>
+            </form>
+
+            <div class="smallprint">
+              By joining, you agree to receive product updates. No spam.
+            </div>
+          </div>
+
+          <div class="card feature" style="margin:0;">
+            <div class="icon">⚡️</div>
+            <h3>Launching first in high-traffic areas</h3>
+            <p>
+              Dining halls, coffee shops, gyms, and campus hotspots—then scaling citywide.
+            </p>
+            <div class="pill" style="margin-top:12px;">
+              <span class="dot"></span> powered by quick community reports
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="faq" class="section">
+        <h2>FAQ</h2>
+        <p>Quick answers for users (and investors) seeing WaitWise for the first time.</p>
+
+        <div class="faq">
+          <details>
+            <summary>Is WaitWise free?</summary>
+            <p>Early access is free. Later, WaitWise can include optional premium features and sponsored placements.</p>
+          </details>
+
+          <details>
+            <summary>How do you keep info accurate?</summary>
+            <p>Reports are time-stamped and location-based. New reports outweigh older ones, and confidence updates with activity.</p>
+          </details>
+
+          <details>
+            <summary>What places does this work for?</summary>
+            <p>Anywhere with lines: dining, coffee, events, clinics, DMVs, gyms, retail, campus services, and more.</p>
+          </details>
+
+          <details>
+            <summary>When can I download the app?</summary>
+            <p>Join the waitlist. You’ll get an invite as soon as your area launches.</p>
+          </details>
+        </div>
+      </section>
+
+      <footer>
+        <div>© <span id="y"></span> WaitWise</div>
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <a href="#waitlist">Waitlist</a>
+          <a href="#features">Features</a>
+          <a href="mailto:hello@waitwise.app">Contact</a>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      document.getElementById("y").textContent = new Date().getFullYear();
+
+      // Temporary handler so the button "works" until you connect a real form endpoint
+      function fakeSubmit(e){
+        e.preventDefault();
+        const email = e.target.email.value;
+        alert("Added to waitlist: " + email + " (connect a form endpoint next)");
+        e.target.reset();
+        return false;
+      }
+    </script>
+  </body>
+</html>
